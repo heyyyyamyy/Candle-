@@ -1,0 +1,6 @@
+{
+  "name": "Lumina & Oak | Corporate Candles & Bespoke Gift Hampers",
+  "description": "Enterprise-grade corporate gifting platform featuring bespoke artisanal candles and curated luxury hampers with interactive 3D branding visualization, bulk tiered ordering, Stripe checkout, automated tracking, and admin CMS.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

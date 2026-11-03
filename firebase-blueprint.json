@@ -1,0 +1,122 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile with role-based access control and corporate account metadata",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Auth UID" },
+        "email": { "type": "string", "format": "email", "description": "Corporate or user email" },
+        "displayName": { "type": "string", "maxLength": 100, "description": "Full name" },
+        "companyName": { "type": "string", "maxLength": 100, "description": "Company or organisation name" },
+        "role": { "type": "string", "enum": ["admin", "corporate", "employee"], "description": "Role-based access level" },
+        "mfaEnabled": { "type": "boolean", "description": "Multi-factor authentication status" },
+        "createdAt": { "type": "string", "description": "ISO timestamp of creation" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Candles and curated corporate gift hampers with bulk pricing and branding options",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique product ID" },
+        "name": { "type": "string", "maxLength": 120, "description": "Product title" },
+        "category": { "type": "string", "enum": ["candle", "hamper", "bundle"], "description": "Product category" },
+        "description": { "type": "string", "maxLength": 1000, "description": "Detailed description" },
+        "basePrice": { "type": "number", "description": "Single unit retail price in USD" },
+        "stock": { "type": "number", "description": "Current inventory count" },
+        "minOrderQty": { "type": "number", "description": "Minimum order quantity" },
+        "burnTimeHours": { "type": "number", "description": "Burn time in hours for candles" },
+        "fragranceNotes": { "type": "string", "maxLength": 200, "description": "Fragrance or flavor notes" },
+        "hamperContents": { "type": "string", "maxLength": 400, "description": "List of items included in the hamper" },
+        "customBrandingAvailable": { "type": "boolean", "description": "Whether corporate logo engraving/printing is supported" },
+        "brandingSetupFee": { "type": "number", "description": "Fixed or waived branding fee" },
+        "finishOptions": { "type": "string", "description": "JSON array of finishes (e.g. Matte Amber, Noir Glass, Marble)" },
+        "imageUrl": { "type": "string", "description": "Featured preview image" }
+      },
+      "required": ["id", "name", "category", "basePrice", "stock"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Corporate client or individual purchase order with branding and delivery tracking",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique order identifier" },
+        "userId": { "type": "string", "description": "Purchaser user ID" },
+        "userEmail": { "type": "string", "format": "email", "description": "Purchaser contact email" },
+        "companyName": { "type": "string", "maxLength": 100, "description": "Corporate entity name" },
+        "items": { "type": "string", "description": "JSON stringified array of ordered line items and customization specs" },
+        "totalUnits": { "type": "number", "description": "Total quantity ordered across line items" },
+        "subtotal": { "type": "number", "description": "Subtotal before volume discount" },
+        "discountRate": { "type": "number", "description": "Tiered volume discount percent" },
+        "discountAmount": { "type": "number", "description": "Discount in USD" },
+        "tax": { "type": "number", "description": "Applicable sales tax" },
+        "total": { "type": "number", "description": "Final paid amount" },
+        "paymentStatus": { "type": "string", "enum": ["pending", "paid", "refunded", "failed"], "description": "Stripe payment status" },
+        "stripePaymentIntentId": { "type": "string", "description": "Stripe transaction reference" },
+        "orderStatus": { "type": "string", "enum": ["received", "processing", "branding_engraving", "dispatched", "delivered", "cancelled"], "description": "Fulfillment status" },
+        "trackingNumber": { "type": "string", "maxLength": 60, "description": "Courier tracking code" },
+        "courier": { "type": "string", "description": "Courier service (FedEx, DHL, BlueDart)" },
+        "brandingConfig": { "type": "string", "description": "JSON string of branding text, logo, finish, lid engraving" },
+        "recipientAddressMode": { "type": "string", "enum": ["single_hq", "individual_addresses", "recipient_portal"], "description": "Employee gifting delivery method" },
+        "createdAt": { "type": "string", "description": "ISO timestamp" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp" }
+      },
+      "required": ["id", "userId", "userEmail", "totalUnits", "total", "paymentStatus", "orderStatus"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Immutable security and compliance event audit log",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Log ID" },
+        "timestamp": { "type": "string", "description": "Timestamp of action" },
+        "actorId": { "type": "string", "description": "User UID who initiated event" },
+        "actorEmail": { "type": "string", "description": "User email" },
+        "action": { "type": "string", "maxLength": 100, "description": "Action performed (e.g. INVENTORY_UPDATE, BULK_ORDER_PLACED, ROLE_CHANGE)" },
+        "resource": { "type": "string", "maxLength": 100, "description": "Target entity" },
+        "severity": { "type": "string", "enum": ["INFO", "WARNING", "CRITICAL"], "description": "Severity level" },
+        "details": { "type": "string", "maxLength": 500, "description": "Human-readable summary or JSON parameters" }
+      },
+      "required": ["id", "timestamp", "actorId", "action", "severity"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "In-app and push notification alerts for order milestone updates and inventory alerts",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Notification ID" },
+        "userId": { "type": "string", "description": "Target user UID" },
+        "title": { "type": "string", "maxLength": 120, "description": "Notification headline" },
+        "body": { "type": "string", "maxLength": 400, "description": "Message body" },
+        "type": { "type": "string", "enum": ["order_update", "inventory_alert", "corporate_approval", "security"], "description": "Alert type" },
+        "read": { "type": "boolean", "description": "Read status" },
+        "createdAt": { "type": "string", "description": "Creation timestamp" }
+      },
+      "required": ["id", "userId", "title", "body", "read"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles, roles, and corporate organization data"
+    },
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Corporate candle and luxury hamper catalog items managed via CMS"
+    },
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Bulk and corporate gifting customer orders"
+    },
+    "/auditLogs/{logId}": {
+      "schema": "AuditLog",
+      "description": "Compliance and security audit logs"
+    },
+    "/notifications/{notificationId}": {
+      "schema": "Notification",
+      "description": "User notifications for orders and announcements"
+    }
+  }
+}
